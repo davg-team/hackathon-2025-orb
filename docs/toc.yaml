@@ -1,0 +1,48 @@
+title: Davg-team documentation
+href: pages/index.yaml
+
+analytics:
+  text: "Мы используем файлы cookie, чтобы вы могли наилучшим образом пользоваться нашим веб-сайтом. Если вы продолжаете использовать наш веб-сайт, мы полагаем, что вы согласны с таким использованием"
+  buttons:
+    accept:
+      text: "Ок"
+      theme: "accent"
+      size: "xl"
+
+navigation:
+  # logo:
+  #   url: "https://github.ru/"
+  #   dark:
+  #     icon: "https://storage.yandexcloud.net/diplodoc-www-assets/logo/ddos-logo-dark.svg"
+  #   light:
+  #     icon: "https://storage.yandexcloud.net/diplodoc-www-assets/navigation/diplodoc-logo.svg"
+  header:
+    # leftItems:
+    #   - text: "Оглавление"
+    #     type: "link"
+    #     url: "../ru"
+    #   - text: "Помощь"
+    #     type: "link"
+    #     url: "./help"
+    rightItems:
+      - type: "controls"
+
+items:
+  - name: Введение
+    href: pages/description.md
+  - name: Описание
+    href: pages/introduction.md
+  - name: Архитектура
+    href: pages/architecture.md
+  - name: Фронтенд
+    expanded: false
+    href: pages/frontend/frontend_index_.md
+    include:
+      mode: link
+      path: pages/frontend/toc.yaml
+  - name: Бэкенд
+    expanded: false
+    href: pages/backend/backend_index_.md
+    include:
+      mode: link
+      path: pages/backend/toc.yaml

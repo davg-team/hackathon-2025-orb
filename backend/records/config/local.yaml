@@ -1,0 +1,3 @@
+env_type: local
+server:
+  port: 8080

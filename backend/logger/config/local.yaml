@@ -1,0 +1,6 @@
+env_type: local
+server:
+  port: 8080
+storage:
+  db_name: local
+  collection: logs

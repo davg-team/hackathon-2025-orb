@@ -1,0 +1,11 @@
+.link {
+  border-radius: 0.5rem;
+  background-color: #000;
+  color: white;
+  padding: 0.3rem;
+  border: 1px solid white;
+}
+
+.header {
+  background-color: #000;
+}

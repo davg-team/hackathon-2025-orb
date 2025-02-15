@@ -1,0 +1,89 @@
+.link {
+  border-radius: 1rem;
+  background-color: #000;
+  color: white;
+  padding: 1rem;
+  border: 1px solid white;
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  font-size: 2rem;
+}
+
+.screen_1 {
+  background-color: rgba(0, 0, 0, 1);
+}
+
+h1 {
+  color: #fff;
+  font-size: 8rem;
+  margin-bottom: 5rem;
+  font-weight: bold;
+}
+
+h2 {
+  color: #fff;
+  font-size: 5rem;
+  padding-bottom: 4rem;
+}
+
+.findForm {
+  background-image: url(/paper-texture.png);
+  height: max-content;
+  padding: 2rem;
+  transform: scale(1.5) translateX(+15%);
+  border-radius: 2.5rem;
+  -webkit-box-shadow: 0px 4px 10px 0 rgba(34, 60, 80, 0.2);
+  -moz-box-shadow: 0px 4px 10px 0 rgba(34, 60, 80, 0.2);
+  box-shadow: 0px 4px 10px 0 rgba(34, 60, 80, 0.2);
+}
+
+.findFormMargin {
+  margin-top: 1rem;
+}
+
+.screen_2 .screen_2__title {
+  padding: 1rem;
+  color: #b3261e;
+  font-size: 2.5rem;
+}
+
+.screen_3_marginTop {
+  padding-top: 5rem;
+}
+
+.screen_3__title {
+  font-size: 3.125rem;
+  margin-bottom: 5rem;
+}
+
+.bigButton {
+  width: 40vw;
+  height: 200px;
+  border-radius: 0.5rem;
+  background-color: #fff;
+  padding: 2rem;
+  font-size: 3.125rem;
+  border: 1px solid #b3261e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (hover: hover) {
+  .bigButton:hover {
+    transition: 0.3s ease all;
+    background-color: #b3261e;
+    color: white;
+  }
+}
+
+.bigButton:active {
+  transform: scale(0.95);
+}
+
+@media (max-width: 1250px) {
+  .landing2Picture {
+    display: none;
+  }
+}

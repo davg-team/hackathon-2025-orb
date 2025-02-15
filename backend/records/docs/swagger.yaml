@@ -1,0 +1,368 @@
+openapi: "3.0.0"
+info:
+  title: Records API
+  version: 1.0.0
+  description: Records API
+servers:
+  - url: http://localhost:8080/api
+    description: Local
+
+paths:
+  /records:
+    get:
+      tags:
+        - Records
+      summary: List all records
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: name
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: middleName
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: lastName
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: published
+          in: query
+          required: false
+          schema:
+            type: boolean
+        - name: userID
+          in: query
+          required: false
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: A list of records
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecordResponse'
+    post:
+      tags:
+        - Records    
+      summary: Create a new record
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordRequest'
+  /records/{id}:
+    get:
+      tags:
+        - Records
+      summary: Get a record by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: A record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordResponse'
+        '404':
+          description: Record not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - Records
+      summary: Update a record by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecordRequest'
+      responses:
+        '200':
+          description: A record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordRequest'
+        '404':
+          description: Record not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /records/{id}/publish:
+    patch:
+      tags:
+        - Records
+      summary: Publish a record by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: A record
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '404':
+          description: Record not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /conflicts:
+    get:
+      tags:
+        - Conflicts
+      summary: List all conflicts
+      responses:
+        '200':
+          description: A list of conflicts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConflictResponse'
+
+  /conflicts/{id}:
+    get:
+      tags:
+        - Conflicts
+      summary: Get a conflict by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: A conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictResponse'
+
+components:
+  schemas:
+    RecordRequest:
+      type: object
+      required:
+        - name
+        - last_name
+      properties:
+        name:
+          type: string
+          example: "Иван"
+        middle_name:
+          type: string
+          example: "Иванович"
+        last_name:
+          type: string
+          example: "Иванов"
+        birth_date:
+          type: string
+          format: date
+          example: "1920-01-01"
+        birth_place:
+          type: string
+          example: "Москва"
+        military_rank:
+          type: string
+          example: "Лейтенант"
+        commissariat:
+          type: string
+          example: "Московский военкомат"
+        awards:
+          type: array
+          items:
+            type: string
+          example: ["Орден Красной Звезды", "Медаль за отвагу"]
+        death_date:
+          type: string
+          format: date
+          example: "1945-05-09"
+        burial_place:
+          type: string
+          example: "Москва, Новодевичье кладбище"
+        bio:
+          type: string
+          example: "Участник Великой Отечественной войны."
+        documents:
+          type: array
+          items:
+            $ref: "#/components/schemas/DocumentRequest"
+        conflict_id:
+          type: array
+          items:
+            type: string
+          example: ["WWII"]
+
+    DocumentRequest:
+      type: object
+      properties:
+        type:
+          type: string
+          example: "Военный билет"
+        url:
+          type: string
+          format: uri
+          example: "https://example.com/document1.pdf"
+    
+    RecordResponse:
+      type: object
+      required:
+        - name
+        - last_name
+      properties:
+        id:
+          type: string
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        name:
+          type: string
+          example: "Иван"
+        middle_name:
+          type: string
+          example: "Иванович"
+        last_name:
+          type: string
+          example: "Иванов"
+        birth_date:
+          type: string
+          format: date
+          example: "1920-01-01"
+        birth_place:
+          type: string
+          example: "Москва"
+        military_rank:
+          type: string
+          example: "Лейтенант"
+        commissariat:
+          type: string
+          example: "Московский военкомат"
+        awards:
+          type: array
+          items:
+            type: string
+          example: ["Орден Красной Звезды", "Медаль за отвагу"]
+        death_date:
+          type: string
+          format: date
+          example: "1945-05-09"
+        burial_place:
+          type: string
+          example: "Москва, Новодевичье кладбище"
+        bio:
+          type: string
+          example: "Участник Великой Отечественной войны."
+        map_id:
+          type: string
+          example: "map_12345"
+        documents:
+          type: array
+          items:
+            $ref: "#/components/schemas/DocumentResponse"
+        conflicts:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConflictResponse"
+        published:
+          type: boolean
+          example: true
+
+    DocumentResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "doc_12345"
+        record_id:
+          type: string
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        type:
+          type: string
+          example: "Военный билет"
+        url:
+          type: string
+          format: uri
+          example: "https://example.com/document1.pdf"
+     
+    ConflictResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "conf_67890"
+        title:
+          type: string
+          example: "Великая Отечественная война"
+        dates:
+          type: string
+          example: "1941-1945"
+        records:
+          type: array
+          items:
+            $ref: "#/components/schemas/RecordResponse"
+          example: []
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
