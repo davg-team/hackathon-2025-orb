@@ -1,19 +1,107 @@
-import {Avatar, Button, Flex} from "@gravity-ui/uikit";
-import {GearPlay} from "@gravity-ui/icons";
-import styles from './index.module.css'
+import { useState, useEffect } from "react";
+import { Avatar, Flex, Button, Icon, Text, TextInput, Modal } from "@gravity-ui/uikit";
+import { Bars, Xmark, ArrowRightToSquare, BookOpen } from "@gravity-ui/icons";
+import Cookies from "js-cookie";
+import styles from "./index.module.css";
+import { Link } from "react-router-dom";
+
+function isTokenValid(token) {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload && payload.exp * 1000 > Date.now();
+  } catch {
+    return false;
+  }
+}
 
 function Header() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const token = Cookies.get("access_token");
+  const hasValidToken = token ? isTokenValid(token) : false;
+  const [state, setState] = useState({ username: "", password: "" });
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+      if (window.innerWidth >= 768) {
+        setMenuOpen(false);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  async function handleLogin() {
+    const { username, password } = state;
+    const response = await fetch("/api/users/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username, password }),
+    });
+    if (response.ok) {
+      window.location.reload();
+    } else {
+      // TODO: show error message
+    }
+  }
+
   return (
-    <Flex className={styles.header} alignItems={'center'} justifyContent={'space-between'} spacing={{p: '5'}}>
-      <Flex className="header__left" gap={'3'} alignItems={'center'}>
-        <Avatar icon={GearPlay} size='xl' />
-        <a className={styles.link}>о проекте</a>
-        <a className={styles.link}>участники</a>
-        <a className={styles.link}>военные конфликты</a>
-        <a className={styles.link}>+ добавить участника</a>
+    <Flex className={styles.header} alignItems={"center"} justifyContent={"space-between"} spacing={{ p: "5" }}>
+      <Flex className={styles.left} gap={"3"} alignItems={"center"}>
+        <Modal open={open} onOpenChange={() => setOpen(false)}>
+          <Flex alignItems={"center"} spacing={{ p: "5" }} width={"40vw"} direction={"column"} gap={"3"}>
+            <Text variant="header-2">Войдите в аккаунт</Text>
+            <a href="https://lk.orb.ru/oauth/authorize_mobile_with_social/esia?response_type=code&client_id=29&scope=email" className={"g-button g-button_view_normal g-button_size_m g-button_pin_round-round g-button_width_max"}>
+              <Flex alignItems={"center"} justifyContent={"center"}>
+                <Text variant="body-2">Войти через ГИС ЕЛК</Text>
+                <Icon data={ArrowRightToSquare} />
+              </Flex>
+            </a>
+            <Text variant="body-2">Или войдите при помощи логина и пароля, полученного от администратора:</Text>
+            <TextInput placeholder="Логин" value={state.username} onChange={(event) => setState({ ...state, username: event.target.value })} />
+            <TextInput placeholder="Пароль" value={state.password} onChange={(event) => setState({ ...state, password: event.target.value })} />
+            <Button width="max" onClick={handleLogin}>Войти</Button>
+          </Flex>
+        </Modal>
+        <Link to={"/"}>
+          <Avatar imgUrl="/logo.svg" size="xl" />
+        </Link>
+        {!isMobile && (
+          <div className={styles.desktopMenu}>
+            <Link to={"/#about"} className={styles.link} onClick={() => setMenuOpen(false)}>о проекте</Link>
+            <Link to={"/#participants"} className={styles.link} onClick={() => setMenuOpen(false)}>участники</Link>
+            <Link to={"/#conflicts"} className={styles.link} onClick={() => setMenuOpen(false)}>военные конфликты</Link>
+            <a className={styles.link} onClick={() => setMenuOpen(false)}>+ добавить участника</a>
+          </div>
+        )}
       </Flex>
-      <Flex className="header__right">
-        <Avatar icon={GearPlay} />
+      {menuOpen && isMobile && (
+        <div className={styles.mobileMenu}>
+          <Link to={"/#about"} className={styles.link} onClick={() => setMenuOpen(false)}>о проекте</Link>
+          <Link to={"/#participants"} className={styles.link} onClick={() => setMenuOpen(false)}>участники</Link>
+          <Link to={"/#conflicts"} className={styles.link} onClick={() => setMenuOpen(false)}>военные конфликты</Link>
+          <a className={styles.link} onClick={() => setMenuOpen(false)}>+ добавить участника</a>
+        </div>
+      )}
+      <Flex alignItems={"center"}>
+        {token && hasValidToken ? (
+          <Link to="/profile">
+            <Avatar size="xl" text={JSON.parse(atob(token.split("."))[1]).full_name} />
+          </Link>
+        ) : (
+          <div onClick={() => setOpen(true)}>
+            <Avatar icon={ArrowRightToSquare} size="xl" />
+          </div>
+        )}
+        {isMobile && (
+          <Button onClick={() => setMenuOpen(!menuOpen)}>
+            {menuOpen ? <Icon data={Xmark} /> : <Icon data={Bars} />}
+          </Button>
+        )}
       </Flex>
     </Flex>
   );

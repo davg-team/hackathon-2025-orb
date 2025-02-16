@@ -83,3 +83,7 @@ func (s *Storage) UpdateRecord(ctx context.Context, record *models.RecordModel) 
 func (s *Storage) PublishRecord(ctx context.Context, recordID string) error {
 	return s.db.WithContext(ctx).Model(&models.RecordModel{}).Where("id = ?", recordID).Update("published", true).Error
 }
+
+func (s *Storage) UpdateRecordMapID(ctx context.Context, recordID string, mapID int) error {
+	return s.db.WithContext(ctx).Model(&models.RecordModel{}).Where("id = ?", recordID).Update("map_id", mapID).Error
+}

@@ -17,7 +17,7 @@ type RecordRequest struct {
 }
 
 type DocumentRequest struct {
-	Type     string `json:"type"`
-	URL      string `json:"url"`
-	RecordID string `json:"-"`
+	Type      string `json:"type"`
+	ObjectKey string `json:"object_key"`
+	RecordID  string `json:"-"`
 }

@@ -1,0 +1,25 @@
+.personeCard {
+  width: 100%;
+  border: 1px solid #B3261E96;
+  border-radius: .5rem;
+  padding: 1rem .75rem;
+  display: flex;
+  justify-content: space-between;
+  text-decoration: none;
+  color: #000;
+  align-items: center;
+}
+
+path {
+  fill: #B3261E;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: .5rem;
+}
+
+.text {
+  font-size: 1rem;
+}

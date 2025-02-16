@@ -38,7 +38,7 @@ type RecordModel struct {
 	DeathDate    string          `json:"death_date"`
 	BurialPlace  string          `json:"burial_place"`
 	Bio          string          `json:"bio"`
-	MapID        string          `json:"map_id"`
+	MapID        int             `json:"map_id"`
 	Documents    []DocumentModel `gorm:"foreignKey:RecordID" json:"documents"`
 	Conflicts    []ConflictModel `gorm:"many2many:record_conflict;" json:"conflicts"`
 	Published    bool            `json:"published"`
@@ -47,9 +47,9 @@ type RecordModel struct {
 type DocumentModel struct {
 	ID string `gorm:"primaryKey" json:"id"`
 
-	RecordID string `json:"record_id"`
-	Type     string `json:"type"`
-	URL      string `json:"url"`
+	RecordID  string `json:"record_id"`
+	Type      string `json:"type"`
+	ObjectKey string `json:"object_key"`
 }
 
 type ConflictModel struct {

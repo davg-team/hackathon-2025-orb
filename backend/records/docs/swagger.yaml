@@ -260,10 +260,9 @@ components:
         type:
           type: string
           example: "Военный билет"
-        url:
+        object_key:
           type: string
-          format: uri
-          example: "https://example.com/document1.pdf"
+          example: "document1.pdf"
     
     RecordResponse:
       type: object
@@ -338,10 +337,9 @@ components:
         type:
           type: string
           example: "Военный билет"
-        url:
+        object_key:
           type: string
-          format: uri
-          example: "https://example.com/document1.pdf"
+          example: "document1.pdf"
      
     ConflictResponse:
       type: object

@@ -11,6 +11,7 @@
     "proxy": "node ./server.js"
   },
   "dependencies": {
+    "@gravity-ui/date-components": "^3.0.1",
     "@gravity-ui/uikit": "^7.2.0",
     "@nextgis/ngw-ol": "^3.0.0-alpha.19",
     "@nextgis/ol-map-adapter": "^3.0.0-alpha.18",
@@ -20,6 +21,8 @@
     "axios": "^1.7.9",
     "cors": "^2.8.5",
     "express": "^4.21.2",
+    "js-cookie": "^3.0.5",
+    "lodash": "^4.17.21",
     "node-fetch": "^3.3.2",
     "ol": "^10.4.0",
     "react": "^18.3.1",
@@ -31,6 +34,8 @@
     "@eslint/js": "^9.13.0",
     "@gravity-ui/components": "^4.0.1",
     "@gravity-ui/icons": "^2.13.0",
+    "@types/js-cookie": "^3.0.6",
+    "@types/lodash": "^4.17.15",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.3",

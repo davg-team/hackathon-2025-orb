@@ -23,9 +23,9 @@ type RecordService interface {
 		limit, offset string,
 		published, userID string,
 	) (*[]models.RecordModel, int, error)
-	CreateRecord(ctx context.Context, record *requests.RecordRequest) (string, error)
+	CreateRecord(ctx context.Context, record *requests.RecordRequest, tokenPayload authorization.TokenPayload) (string, error)
 	PublishRecord(ctx context.Context, recordID string, tokenPayload authorization.TokenPayload) error
-	UpdateRecord(ctx context.Context, record *models.RecordModel) error
+	UpdateRecord(ctx context.Context, id string, record *models.RecordModel) error
 
 	AddDocument(ctx context.Context, recordID string, document *requests.DocumentRequest) error
 }
@@ -80,7 +80,7 @@ func (r *RecordRouter) GetRecordsByParams(ctx *gin.Context) {
 }
 
 func (r *RecordRouter) CreateRecord(ctx *gin.Context) {
-	_, err := authorization.FromContext(ctx)
+	payload, err := authorization.FromContext(ctx)
 	if err != nil {
 		utils.HandleError(ctx, err)
 		return
@@ -91,7 +91,7 @@ func (r *RecordRouter) CreateRecord(ctx *gin.Context) {
 		return
 	}
 
-	recordID, err := r.service.CreateRecord(ctx, &record)
+	recordID, err := r.service.CreateRecord(ctx, &record, payload)
 	if err != nil {
 		utils.HandleError(ctx, err)
 		return
@@ -114,12 +114,13 @@ func (r *RecordRouter) PublishRecord(ctx *gin.Context) {
 }
 
 func (r *RecordRouter) UpdateRecord(ctx *gin.Context) {
+	id := ctx.Param("id")
 	var record models.RecordModel
 	if err := ctx.ShouldBindJSON(&record); err != nil {
 		utils.HandleError(ctx, err)
 		return
 	}
-	if err := r.service.UpdateRecord(ctx, &record); err != nil {
+	if err := r.service.UpdateRecord(ctx, id, &record); err != nil {
 		utils.HandleError(ctx, err)
 		return
 	}
@@ -153,8 +154,8 @@ func (r *RecordRouter) init(key *rsa.PublicKey) {
 	recordRouter.GET("/", r.GetRecordsByParams)
 	recordRouter.PUT("/:id", r.UpdateRecord)
 
-	recordRouter.POST("/", r.CreateRecord)
-	recordRouter.PATCH("/:id/publish", r.PublishRecord)
+	recordRouter.POST("/", authorization.MiddlwareJWT(key), r.CreateRecord)
+	recordRouter.PATCH("/:id/publish", authorization.MiddlwareJWT(key), r.PublishRecord)
 
 	recordRouter.POST("/:id/documents", authorization.MiddlwareJWT(key), r.AddDocument)
 }

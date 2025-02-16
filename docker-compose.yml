@@ -39,6 +39,34 @@ services:
     depends_on:
       - postgres_db
 
+  logger:
+    image: cr.yandex/crpra91s6h2kfrop22b1/davg/logger
+    ports:
+      - "8081:8080"
+    environment:
+      - ENV_TYPE=prod
+      - DB_URI=mongodb://root:passwordXD_1234@mongodb:27017
+    networks:
+      - backbone
+    depends_on:
+      - mongodb
+
+
+  records:
+    image: cr.yandex/crpra91s6h2kfrop22b1/davg/records
+    hostname: records
+    ports:
+      - "8080:8080"
+    environment:
+      - ENV_TYPE=prod
+      - DATABASE_URL=postgresql://user:azp7speotnJP4iCRfA7j@217.12.38.203:5432/mydatabase
+    volumes:
+      - ./keys:/app/keys:ro
+    networks:
+      - backbone
+    depends_on:
+     - postgres_db
+
   # databases
   postgres_db:
     image: postgres
@@ -60,21 +88,25 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  # mongodb:
-  #   image: mongo
-  #   container_name: mongodb
-  #   environment:
-  #     MONGO_INITDB_ROOT_USERNAME: root
-  #     MONGO_INITDB_ROOT_PASSWORD: example
-  #   ports:
-  #     - "27017:27017"
-  #   volumes:
-  #     - mongo_data:/data/db
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "10m"
-  #       max-file: "3"
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    hostname: mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: passwordXD_1234
+      MONGO_INITDB_DATABASE: local
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - backbone
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   # # nginx
   # frontend-build:
@@ -112,4 +144,4 @@ networks:
 
 volumes:
   postgres_data:
-  # mongo_data:
+  mongo_data:

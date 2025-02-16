@@ -25,9 +25,9 @@ type RecordService interface {
 	Record(ctx context.Context, id string) (*models.RecordModel, error)
 	Records(ctx context.Context, limit, offset string) (*[]models.RecordModel, int, error)
 	RecordsByParams(ctx context.Context, name string, middleName string, lastName string, limit, offset string, published, userID string) (*[]models.RecordModel, int, error)
-	CreateRecord(ctx context.Context, record *requests.RecordRequest) (string, error)
+	CreateRecord(ctx context.Context, record *requests.RecordRequest, tokenPayload authorization.TokenPayload) (string, error)
 	PublishRecord(ctx context.Context, recordID string, tokenPayload authorization.TokenPayload) error
-	UpdateRecord(ctx context.Context, record *models.RecordModel) error
+	UpdateRecord(ctx context.Context, id string, record *models.RecordModel) error
 
 	AddDocument(ctx context.Context, recordID string, document *requests.DocumentRequest) error
 }

@@ -8,10 +8,17 @@ export default defineConfig({
     host: "0.0.0.0",
     port: 3000,
     proxy: {
-      "/api": {
+      "/api-map": {
         target: "https://hackathon-8.orb.ru/gis/",
+        rewrite: (path) => path.replace(/^\/api-map/, ""),
+        secure: false,
+        changeOrigin: true,
+      },
+      "/api": {
+        target: "http://hackathon-8.orb.ru/api/", 
         rewrite: (path) => path.replace(/^\/api/, ""),
         secure: false,
+        changeOrigin: true,
       },
     },
   },

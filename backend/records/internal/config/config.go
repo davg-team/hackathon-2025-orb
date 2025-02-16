@@ -21,10 +21,38 @@ type config struct {
 	EnvType string        `yaml:"env_type"`
 	Server  serverConfig  `yaml:"server"`
 	Storage storageConfig `yaml:"storage"`
+	Client  clientConfig  `yaml:"client"`
+	Bucket  bucketConfig  `yaml:"bucket"`
 }
 
 type serverConfig struct {
 	Port int `yaml:"port"`
+}
+
+// type bucketConfig struct {
+// 	Endpoint   string `yaml:"endpoint"`
+// 	AccessKey  string `yaml:"access_key"`
+// 	SecretKey  string `yaml:"secret_key"`
+// 	BucketName string `yaml:"bucket_name"`
+// }
+
+type bucketConfig struct {
+	Endpoint   string `env:"MINIO_ENDPOINT"`
+	AccessKey  string `env:"MINIO_ACCESS_KEY"`
+	SecretKey  string `env:"MINIO_SECRET_KEY"`
+	BucketName string `env:"MINIO_BUCKET_NAME"`
+}
+
+// type clientConfig struct {
+// 	LayerID  string `yaml:"layer_id"`
+// 	Username string `yaml:"username"`
+// 	Password string `yaml:"password"`
+// }
+
+type clientConfig struct {
+	LayerID  string `env:"CLIENT_LAYER_ID"`
+	Username string `env:"CLIENT_USERNAME"`
+	Password string `env:"CLIENT_PASSWORD"`
 }
 
 type storageConfig struct {

@@ -9,9 +9,35 @@ from app.auth import create_access_token, verify_password
 from app.config import settings
 from app.database import get_db
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+
+
+def get_current_user(request: Request, db: Session = Depends(get_db)) -> models.User:
+    """
+    Извлекает текущего пользователя из cookie access_token.
+    """
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Пользователь не аутентифицирован",
+        )
+    from app.auth import decode_access_token
+
+    payload = decode_access_token(token)
+    if not payload:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Неверный токен"
+        )
+    user = crud.get_user(db, payload.get("user_id"))
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Пользователь не найден"
+        )
+    return user
 
 
 @router.post("/login", response_model=schemas.Token)
@@ -46,6 +72,8 @@ def login_for_access_token(
         expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
     )
     response.set_cookie(key="access_token", value=access_token, httponly=False)
+    response.headers["Location"] = "/"
+    response.status_code = status.HTTP_302_FOUND
     return schemas.Token(access_token=access_token)
 
 
@@ -67,7 +95,8 @@ def oauth_login(
             "code": code,
             "client_id": settings.OAUTH_CLIENT_ID,
             "client_secret": settings.OAUTH_CLIENT_SECRET,
-            "redirect_uri": "https://fsp-platform.ru/callback/auth/return/rsaag",  # "https://hackathon-8.orb.ru/auth/oauth/callback"
+            # "redirect_uri": "https://fsp-platform.ru/callback/auth/return/rsaag",
+            "redirect_uri": "https://hackathon-8.orb.ru/auth/oauth/callback",
         },
         headers=headers,
     )
@@ -146,6 +175,9 @@ def oauth_login(
         expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
     )
     response.set_cookie(key="access_token", value=jwt_token, httponly=False)
+    # редирект на главную
+    response.headers["Location"] = "/"
+    response.status_code = status.HTTP_302_FOUND
     return schemas.Token(access_token=jwt_token)
 
 
@@ -159,7 +191,7 @@ def logout(response: Response):
 
 
 @router.get("/me", response_model=schemas.UserOut)
-def read_users_me(current_user: models.User = Depends(crud.get_current_user)):
+def read_users_me(current_user: models.User = Depends(get_current_user)):
     """
     Получение информации о текущем пользователе.
     """

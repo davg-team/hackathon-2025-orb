@@ -44,10 +44,16 @@ func MiddlwareJWT(publicKey *rsa.PublicKey) gin.HandlerFunc {
 		}
 
 		user := TokenPayload{
-			ID:   claims["sub"].(string),
-			Role: claims["type"].(string),
+			Role: claims["role"].(string),
 			Exp:  int64(claims["exp"].(float64)),
 		}
+
+		idString, ok := claims["user_id"].(float64)
+		if !ok {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+			return
+		}
+		user.ID = fmt.Sprintf("%d", int(idString))
 
 		// Set context
 		c.Set(string(Key), user)
