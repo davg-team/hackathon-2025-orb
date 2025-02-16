@@ -66,6 +66,27 @@ function UserAdd() {
     conflictId: [],
   });
 
+  // async function sendFiles() {
+  //   let filesToSend = [logo, ...files];
+  //   filesToSend = files.filter((file) => file.file.size > 0);
+  //   for (const file of filesToSend) {
+  //     // octet
+  //     const response = await fetch("/user-documents", {
+  //       method: "PUT",
+  //       headers: { "Content-Type": "application/octet-stream" },
+  //       body: await file.file.arrayBuffer(),
+  //     });
+
+  //     if (!response.ok) {
+  //       // TODO notify about error
+  //     } else {
+  //       const data = await response.json();
+  //       console.log(data);
+  //     }
+    
+  //   }
+  // }
+
   async function registerPeople() {
     // await sendFiles()
 
@@ -136,8 +157,6 @@ function UserAdd() {
   function removeFile(index: number) {
     setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
   }
-
-
 
   return (
     <Flex justifyContent={"center"} spacing={{ p: "7" }}>
