@@ -4,7 +4,6 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Search from "pages/Search";
 import Person from "pages/Person";
 import User from "pages/User";
-import Admin from "pages/Admin";
 import UserAdd from "pages/UserAdd";
 
 const Router = () => {
@@ -34,11 +33,18 @@ const Router = () => {
           element={
             <>
               <Header />
-              <Person />
+              <Person mode="base" />
             </>
           }
         />
-				{/* early added people */}
+        <Route
+          path="/person-print/:id"
+          element={
+            <>
+              <Person mode="print"/>
+            </>
+          }
+        />
         <Route
           path="/profile"
           element={
@@ -48,33 +54,12 @@ const Router = () => {
             </>
           }
         />
-				{/* add new people into system */}
         <Route
-          path="/profile/:id/add"
+          path="/person/add"
           element={
             <>
               <Header />
               <UserAdd />
-            </>
-          }
-        />
-				{/* users for aprove */}
-        <Route
-          path="/admin/:id"
-          element={
-            <>
-              <Header />
-              <Admin />
-            </>
-          }
-        />
-				{/* requests from users */}
-        <Route
-          path="/admin/:id/requests"
-          element={
-            <>
-              <Header />
-              <Person />
             </>
           }
         />

@@ -9,13 +9,14 @@ import (
 	"github.com/davg/logger/internal/config"
 	"github.com/davg/logger/internal/domain"
 	"github.com/davg/logger/internal/domain/requests"
+	"github.com/davg/logger/internal/domain/response"
 	"github.com/davg/logger/internal/server/log"
 	"github.com/gin-gonic/gin"
 )
 
 type Service interface {
 	Log(ctx context.Context, id string) ([]domain.LogModel, error)
-	Logs(ctx context.Context) ([]domain.LogModel, error)
+	Logs(ctx context.Context) ([]response.LogsResponse, error)
 	CreateLog(ctx context.Context, log requests.LogPOST) (string, error)
 }
 

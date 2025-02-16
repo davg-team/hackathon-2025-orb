@@ -48,7 +48,6 @@ def read_users(
     skip: int = 0,
     limit: int = 100,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(get_current_superadmin),
 ):
     """
     Получение списка всех пользователей (доступно только суперадмину).

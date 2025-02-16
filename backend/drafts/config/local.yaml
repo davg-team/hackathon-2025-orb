@@ -1,0 +1,11 @@
+env_type: local
+
+server:
+  port: 8080
+
+storage:
+  host: localhost
+  port: 5433
+  user: postgres
+  pass: password
+  db_name: drafts

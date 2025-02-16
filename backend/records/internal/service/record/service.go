@@ -190,12 +190,21 @@ func (s *RecordService) CreateRecord(ctx context.Context, record *requests.Recor
 		Conflicts:    conflicts,
 		Published:    false,
 		Documents:    documents,
-		// MapID:        record.MapID, TODO: IMPLEMENT!!!
 	}
 
 	if err := s.storage.CreateRecord(ctx, recordModel); err != nil {
 		log.Error("failed to create record", "error", err)
 		return "", fmt.Errorf("%w: %s", customerrors.ErrBadRequest, "failed to create record")
+	}
+
+	logRequest := service.LogEntry{
+		UserID: tokenPayload.ID,
+		Type:   "create",
+		Info:   fmt.Sprintf("create record %s", recordID),
+	}
+
+	if err := service.SendLog(logRequest); err != nil {
+		log.Error("failed to send log", "error", err)
 	}
 
 	return recordID, nil
@@ -208,8 +217,8 @@ func (s *RecordService) PublishRecord(ctx context.Context, recordID string, toke
 
 	log.Info("Publish record", "recordID", recordID)
 
-	if tokenPayload.Role != "superadmin" {
-		return fmt.Errorf("%w: %s", customerrors.ErrForbidden, "only superadmin can publish record")
+	if tokenPayload.Role != "superadmin" && tokenPayload.Role != "root" {
+		return fmt.Errorf("%w: %s", customerrors.ErrForbidden, "only superadmin or root can publish record")
 	}
 
 	if err := s.storage.PublishRecord(ctx, recordID); err != nil {
@@ -255,6 +264,7 @@ func (s *RecordService) PublishRecord(ctx context.Context, recordID string, toke
 			"info":     record.Bio,
 			"kontrakt": conflictNames,
 			"nagrads":  awardNames,
+			"id":       recordID,
 		},
 		"geom": fmt.Sprintf("POINT(%f %f)", latitude, longitude),
 	}
@@ -297,6 +307,16 @@ func (s *RecordService) PublishRecord(ctx context.Context, recordID string, toke
 			return fmt.Errorf("%w: %s", customerrors.ErrInternal, "failed to attach file")
 		}
 
+	}
+
+	logRequest := service.LogEntry{
+		UserID: tokenPayload.ID,
+		Type:   "publish",
+		Info:   fmt.Sprintf("publish record %s", recordID),
+	}
+
+	if err := service.SendLog(logRequest); err != nil {
+		log.Error("failed to send log", "error", err)
 	}
 
 	return nil
@@ -361,6 +381,7 @@ func (s *RecordService) UpdateRecord(ctx context.Context, id string, record *mod
 			"info":     record.Bio,
 			"kontrakt": conflictNames,
 			"nagrads":  awardNames,
+			"id":       id,
 		},
 		"geom": fmt.Sprintf("POINT(%f %f)", latitude, longitude),
 	}

@@ -4,10 +4,14 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"strconv"
+	"time"
 
 	"github.com/davg/logger/internal/domain"
 	"github.com/davg/logger/internal/domain/requests"
+	"github.com/davg/logger/internal/domain/response"
 	"github.com/davg/logger/internal/errors"
+	"github.com/davg/logger/pkg/client"
 	"github.com/google/uuid"
 )
 
@@ -45,7 +49,7 @@ func (s *Service) Log(ctx context.Context, id string) ([]domain.LogModel, error)
 	return log, nil
 }
 
-func (s *Service) Logs(ctx context.Context) ([]domain.LogModel, error) {
+func (s *Service) Logs(ctx context.Context) ([]response.LogsResponse, error) {
 	const op = "service.Logs"
 
 	logger := s.log.With(slog.String("op", op))
@@ -57,8 +61,32 @@ func (s *Service) Logs(ctx context.Context) ([]domain.LogModel, error) {
 		return nil, fmt.Errorf("%w: %s", errors.InternalServerError, "error getting logs")
 	}
 
+	users, err := client.FetchUsers()
+	if err != nil {
+		s.log.Error("error getting users", slog.String("error", err.Error()))
+		return nil, fmt.Errorf("%w: %s", errors.InternalServerError, "error getting users")
+	}
+
+	var logsRespList []response.LogsResponse
+	for _, log := range logs {
+		logsResponse := response.LogsResponse{
+			ID:     log.ID,
+			Action: log.Action,
+			Time:   log.Time,
+			Info:   log.Info,
+		}
+
+		for _, user := range users {
+			if user.ID == log.UserID {
+				logsResponse.User = user
+			}
+		}
+
+		logsRespList = append(logsRespList, logsResponse)
+	}
+
 	logger.Info("Logs found")
-	return logs, nil
+	return logsRespList, nil
 }
 
 func (s *Service) CreateLog(ctx context.Context, log requests.LogPOST) (string, error) {
@@ -67,11 +95,17 @@ func (s *Service) CreateLog(ctx context.Context, log requests.LogPOST) (string, 
 	logger := s.log.With(slog.String("op", op))
 	logger.Info("Creating log")
 
+	idInt, err := strconv.Atoi(log.UserID)
+	if err != nil {
+		s.log.Error("error creating log", slog.String("error", err.Error()))
+		return "", fmt.Errorf("%w: %s", errors.InternalServerError, "error creating log")
+	}
+
 	log_model := domain.LogModel{
 		ID:     uuid.New().String(),
-		UserID: log.UserID,
+		UserID: idInt,
 		Action: log.Action,
-		Time:   log.Time,
+		Time:   time.Now(),
 		Info:   log.Info,
 	}
 

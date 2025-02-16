@@ -1,24 +1,10 @@
 version: "3.8"
 
 services:
-  # service1:
-  #   build:
-  #     context: ./service1
-  #   container_name: service1
-  #   ports:
-  #     - "8001:8000"
-
-  # service2:
-  #   build:
-  #     context: ./service2
-  #   container_name: service2
-  #   ports:
-  #     - "8002:8000"
-
   users:
-    # build:
-    #   context: ./backend/users
-    image: cr.yandex/crpra91s6h2kfrop22b1/davg/users
+    build:
+      context: ./backend/users
+    # image: cr.yandex/crpra91s6h2kfrop22b1/davg/users
     hostname: users
     ports:
       - "8000:8000"
@@ -31,6 +17,8 @@ services:
       - OAUTH_TOKEN_URL=https://lk.orb.ru/oauth/token
       - OAUTH_USERINFO_URL=https://lk.orb.ru/api/get_user
       - OAUTH_SCOPES=rsaag_id+email
+      - OAUTH_CLIENT_SECRET=2jp1SXV7sQQP7bQuJb2AV8cosHrk24JDOLKaG7u1
+      - OAUTH_CLIENT_ID=29
     volumes:
       - ./keys:/run/secrets:ro
       - ./hackathon-8.orb.ru:/etc/letsencrypt/live/hackathon-8.orb.ru
@@ -39,10 +27,31 @@ services:
     depends_on:
       - postgres_db
 
-  logger:
-    image: cr.yandex/crpra91s6h2kfrop22b1/davg/logger
+  drafts:
+    # image: cr.yandex/crpra91s6h2kfrop22b1/davg/drafts
+    build: 
+      context: ./backend/drafts
+    hostname: drafts
     ports:
-      - "8081:8080"
+      - "8082:8082"
+    environment:
+      - ENV_TYPE=prod
+      - DATABASE_URL=postgresql://user:azp7speotnJP4iCRfA7j@217.12.38.203:5432/mydatabase
+    networks:
+      - backbone
+    depends_on:
+      - postgres_db
+      - records
+    volumes:
+      - ./keys:/app/keys:ro
+  
+  logger:
+    # image: cr.yandex/crpra91s6h2kfrop22b1/davg/logger
+    build:
+      context: ./backend/logger
+    hostname: logger
+    ports:
+      - "8081:8081"
     environment:
       - ENV_TYPE=prod
       - DB_URI=mongodb://root:passwordXD_1234@mongodb:27017
@@ -50,22 +59,34 @@ services:
       - backbone
     depends_on:
       - mongodb
+      - users
 
 
   records:
-    image: cr.yandex/crpra91s6h2kfrop22b1/davg/records
+    # image: cr.yandex/crpra91s6h2kfrop22b1/davg/records
+    build:
+      context: ./backend/records
     hostname: records
     ports:
       - "8080:8080"
     environment:
       - ENV_TYPE=prod
       - DATABASE_URL=postgresql://user:azp7speotnJP4iCRfA7j@217.12.38.203:5432/mydatabase
+      - MINIO_ENDPOINT=hackathon-8.orb.ru:9000
+      - MINIO_ACCESS_KEY=oRJ0HxenpA7N3jPeXGOV
+      - MINIO_SECRET_KEY=ezk5pgyodSTUUYKS6Mg0gaE28JDGlu5uo0Stnq3W
+      - MINIO_BUCKET_NAME=user-documents
+      - CLIENT_LAYER_ID=8788
+      - CLIENT_USERNAME=hackathon_19
+      - CLIENT_PASSWORD=hackathon_19_25
     volumes:
       - ./keys:/app/keys:ro
     networks:
       - backbone
     depends_on:
-     - postgres_db
+      - postgres_db
+      - minio
+      - logger
 
   # databases
   postgres_db:
@@ -107,20 +128,37 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-
+  
+  minio:
+    image: quay.io/minio/minio:latest
+    container_name: minio
+    hostname: minio
+    volumes:
+      - ./data:/data
+    ports:
+      - 9000:9000
+      - 9001:9001
+    environment:
+      MINIO_ROOT_USER: 'root'
+      MINIO_ROOT_PASSWORD: 'passwordXD_1234'
+      MINIO_ADDRESS: ':9000'
+      MINIO_CONSOLE_ADDRESS: ':9001'
+    networks:
+      - backbone
+    command: minio server /data
   # # nginx
-  # frontend-build:
-  #   build:
-  #     context: ./frontend
-  #   container_name: frontend-build
-  #   volumes:
-  #     - ./frontend/:/frontend/build/:rw
-  #   # command: ["true"] # Запускается только для сборки
+  frontend-build:
+    build:
+      context: ./frontend
+    container_name: frontend-build
+    volumes:
+      - ./frontend/:/frontend/build/:rw
+    # command: ["true"] # Запускается только для сборки
 
   nginx:
-    # build:
-    #   context: ./router
-    image: cr.yandex/crpra91s6h2kfrop22b1/davg/nginx
+    build:
+      context: ./router
+    # image: cr.yandex/crpra91s6h2kfrop22b1/davg/nginx
     container_name: nginx
     ports:
       - "80:80"

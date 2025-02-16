@@ -51,6 +51,8 @@ func (c *Client) AddFeature(data map[string]interface{}) (int, error) {
 	}
 	defer resp.Body.Close()
 
+	fmt.Println(resp.StatusCode)
+
 	var result map[string]int
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		return 0, err

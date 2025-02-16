@@ -198,10 +198,10 @@ def read_users_me(current_user: models.User = Depends(get_current_user)):
     return current_user
 
 
-@router.post("/login_as_root", response_model=schemas.Token)
+@router.get("/login_as_root", response_model=schemas.Token)
 def login_as_root(
     response: Response,
-    code: int,
+    code: str,
     db: Session = Depends(get_db),
 ):
     """

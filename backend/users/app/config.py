@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     OAUTH_SCOPES: str = "rsaag_id+email"
     OAUTH_CLIENT_ID: str
     OAUTH_CLIENT_SECRET: str
+    ROOT_LOGIN_CODE: str = "code"
 
     class Config:
         env_file = ".env"

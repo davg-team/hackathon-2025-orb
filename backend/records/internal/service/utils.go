@@ -1,12 +1,14 @@
 package service
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"math"
 	"net/http"
 	"net/url"
 	"strconv"
+	"time"
 )
 
 type OSMResponse struct {
@@ -50,4 +52,40 @@ func toEPSG3857(lat, lon float64) (x, y float64) {
 	x = lon * 20037508.34 / 180
 	y = math.Log(math.Tan((90+lat)*math.Pi/360)) * 20037508.34 / math.Pi
 	return x, y
+}
+
+type LogEntry struct {
+	UserID string `json:"user_id"`
+	Type   string `json:"type"`
+	Info   string `json:"info"`
+}
+
+// sendLog отправляет лог на сервер
+func SendLog(log LogEntry) error {
+	url := "http://logger:8081/api/logs"
+
+	jsonData, err := json.Marshal(log)
+	if err != nil {
+		return fmt.Errorf("failed to serialize JSON: %w", err)
+	}
+
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
+	if err != nil {
+		return fmt.Errorf("failed to create request: %w", err)
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{Timeout: 5 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("request execution failed: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+		return fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	}
+
+	return nil
 }

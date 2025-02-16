@@ -1,26 +1,29 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { useState, useEffect } from "react";
 import { Avatar, Flex, Button, Icon, Text, TextInput, Modal } from "@gravity-ui/uikit";
-import { Bars, Xmark, ArrowRightToSquare, BookOpen } from "@gravity-ui/icons";
+import { Bars, Xmark, ArrowRightToSquare } from "@gravity-ui/icons";
 import Cookies from "js-cookie";
 import styles from "./index.module.css";
 import { Link } from "react-router-dom";
-
-function isTokenValid(token) {
-  try {
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    return payload && payload.exp * 1000 > Date.now();
-  } catch {
-    return false;
-  }
-}
+import { isValid } from "shared";
 
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const token = Cookies.get("access_token");
-  const hasValidToken = token ? isTokenValid(token) : false;
+  const hasValidToken = token ? isValid(token) : false;
   const [state, setState] = useState({ username: "", password: "" });
   const [open, setOpen] = useState(false);
+
+  let fullName = "";
+  if (token && token.split(".").length === 3) {
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      fullName = payload.full_name || "";
+    } catch (error) {
+      console.error("Ошибка декодирования токена:", error);
+    }
+  }
 
   useEffect(() => {
     const handleResize = () => {
@@ -45,7 +48,7 @@ function Header() {
     if (response.ok) {
       window.location.reload();
     } else {
-      // TODO: show error message
+      console.error("Ошибка входа");
     }
   }
 
@@ -63,7 +66,7 @@ function Header() {
             </a>
             <Text variant="body-2">Или войдите при помощи логина и пароля, полученного от администратора:</Text>
             <TextInput placeholder="Логин" value={state.username} onChange={(event) => setState({ ...state, username: event.target.value })} />
-            <TextInput placeholder="Пароль" value={state.password} onChange={(event) => setState({ ...state, password: event.target.value })} />
+            <TextInput placeholder="Пароль" type="password" value={state.password} onChange={(event) => setState({ ...state, password: event.target.value })} />
             <Button width="max" onClick={handleLogin}>Войти</Button>
           </Flex>
         </Modal>
@@ -75,7 +78,7 @@ function Header() {
             <Link to={"/#about"} className={styles.link} onClick={() => setMenuOpen(false)}>о проекте</Link>
             <Link to={"/#participants"} className={styles.link} onClick={() => setMenuOpen(false)}>участники</Link>
             <Link to={"/#conflicts"} className={styles.link} onClick={() => setMenuOpen(false)}>военные конфликты</Link>
-            <a className={styles.link} onClick={() => setMenuOpen(false)}>+ добавить участника</a>
+            <Link to={'/person/add'} className={styles.link} onClick={() => setMenuOpen(false)}>+ добавить участника</Link>
           </div>
         )}
       </Flex>
@@ -84,13 +87,13 @@ function Header() {
           <Link to={"/#about"} className={styles.link} onClick={() => setMenuOpen(false)}>о проекте</Link>
           <Link to={"/#participants"} className={styles.link} onClick={() => setMenuOpen(false)}>участники</Link>
           <Link to={"/#conflicts"} className={styles.link} onClick={() => setMenuOpen(false)}>военные конфликты</Link>
-          <a className={styles.link} onClick={() => setMenuOpen(false)}>+ добавить участника</a>
+          <Link to={'/person/add'} className={styles.link} onClick={() => setMenuOpen(false)}>+ добавить участника</Link>
         </div>
       )}
       <Flex alignItems={"center"}>
         {token && hasValidToken ? (
           <Link to="/profile">
-            <Avatar size="xl" text={JSON.parse(atob(token.split("."))[1]).full_name} />
+            <Avatar size="xl" text={fullName} />
           </Link>
         ) : (
           <div onClick={() => setOpen(true)}>

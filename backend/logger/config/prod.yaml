@@ -1,6 +1,6 @@
 env_type: prod
 server:
-  port: 8080
+  port: 8081
 storage:
   db_name: local
   collection: logs

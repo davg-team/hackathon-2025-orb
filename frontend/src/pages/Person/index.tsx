@@ -7,6 +7,7 @@ import {
   TextArea,
   Skeleton,
   Popover,
+  Button,
 } from "@gravity-ui/uikit";
 import { ArrowDownToLine } from "@gravity-ui/icons";
 import styles from "./index.module.css";
@@ -44,20 +45,32 @@ interface Document {
   object_key: string;
 }
 
-function Person() {
+interface PersonProps {
+  mode: string;
+}
+
+function Person({ mode }: PersonProps) {
   const [data, setData] = useState<VeteranData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState();
+  const [hasLogo, setHasLogo] = useState(false);
+  const [images, setImages] = useState<Document[]>([]);
   const params = useParams();
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    console.log(params);
     try {
       const response = await fetch(`/api/records/${params.id}`);
       const result = await response.json();
       setData(result);
-      console.log(result);
+
+      setHasLogo(result.documents.some((doc: Document) => doc.type === "logo"));
+
+      setImages(
+        result.documents
+          .filter((doc: Document) => doc.type === "image")
+          .map((doc: Document) => doc.object_key)
+      );
     } catch (err: unknown) {
       // @ts-ignore
       setError(err);
@@ -69,6 +82,16 @@ function Person() {
   useEffect(() => {
     fetchData();
   }, [fetchData, params.id]);
+
+  // После полной загрузки данных, если mode === "print", вызываем печать.
+  useEffect(() => {
+    if (mode === "print" && !loading && data) {
+      // Небольшая задержка для гарантии, что всё отрендерилось
+      setTimeout(() => {
+        window.print();
+      }, 3);
+    }
+  }, [mode, loading, data]);
 
   if (loading) {
     return (
@@ -126,8 +149,10 @@ function Person() {
                 width={200}
                 height={200}
                 style={{ objectFit: "contain" }}
-                // eslint-disable-next-line no-constant-binary-expression
-                src={`/api/files/${data?.documents.filter((doc) => doc.type === "logo")[0].object_key}` || "/person-default.jpg"}
+                src={
+                  hasLogo ? `/api/files/${data?.documents.filter((docs: Document) => docs.type === "logo")[0].object_key}` :
+                  "/person-default.jpg"
+                }
                 alt="фотография"
                 className={styles.person__photo}
               />
@@ -184,20 +209,24 @@ function Person() {
           </Flex>
         </Flex>
       </Flex>
-      <Flex className={styles.person__photos}>
+      
+      {/* Кнопка вывода на печать при условии, что mode !== "print" */}
+      {mode !== "print" && (
+        <>
+        <Flex className={styles.person__photos}>
         <Text style={{ fontWeight: "700" }} variant="display-1">
           Фотографии
         </Text>
         <Flex className={styles.photos}>
           {(data?.documents.length as number) > 0 ? (
-            data?.documents.filter((doc) => doc.type === "image").map((doc) => (
+            images.map((doc: Document) => (
               <Box
                 key={doc.id}
                 width={250}
                 height={200}
                 className={styles.photo}
               >
-                <img src={`/api/files/${doc.object_key || ''}`} alt="" />
+                <img src={`/api/files/${doc.object_key || ""}`} alt="" />
               </Box>
             ))
           ) : (
@@ -215,7 +244,7 @@ function Person() {
               <a
                 download
                 key={doc.id}
-                href={'/api/files/' + doc.object_key}
+                href={"/api/files/" + doc.object_key}
                 className={styles.docs__item}
               >
                 Документ
@@ -227,6 +256,16 @@ function Person() {
           )}
         </Flex>
       </Flex>
+      <br />
+        <Flex>
+          <Button
+            onClick={() => window.location.assign(`/person-print/${data?.id}`)}
+          >
+            Вывести на печать
+          </Button>
+        </Flex>
+        </>
+      )}
     </Flex>
   );
 }

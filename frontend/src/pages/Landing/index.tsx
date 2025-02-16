@@ -14,6 +14,8 @@ function Landing() {
     lastName: ''
   })
 
+  // Cookies.set('token', 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJlbWFpbCI6ImFkbWluIiwicm9sZSI6InJvb3QiLCJzbmlscyI6IjAwMC0wMDAtMDAwIDAwIiwiZnVsbF9uYW1lIjoiXHUwNDIxXHUwNDQzXHUwNDNmXHUwNDM1XHUwNDQwXHUwNDMwXHUwNDM0XHUwNDNjXHUwNDM4XHUwNDNkIFx1MDQyMVx1MDQ0M1x1MDQzZlx1MDQzNVx1MDQ0MFx1MDQzMFx1MDQzNFx1MDQzY1x1MDQzOFx1MDQzZCIsIm9yZ2FuaXphdGlvbiI6Ilx1MDQxMFx1MDQzNFx1MDQzY1x1MDQzOFx1MDQzZFx1MDQzOFx1MDQ0MVx1MDQ0Mlx1MDQ0MFx1MDQzMFx1MDQ0Nlx1MDQzOFx1MDQ0ZiIsInBvc2l0aW9uIjoiXHUwNDIxXHUwNDQzXHUwNDNmXHUwNDM1XHUwNDQwXHUwNDMwXHUwNDM0XHUwNDNjXHUwNDM4XHUwNDNkIiwicGhvbmUiOiIiLCJleHAiOjE3Mzk3MTE4MzR9.nrPwinQGm2baLF8LnDe4mmkh5o46wNkAjYdWU_DBCnunda8Kr4XDH9YtagFK5YC4-djfOekv1a4KtiT5J4Pho2kSRGA5Xx0ZASjRJXNlW0kpAHBfCmJeBZNTRUPZukTLOKaC50UMq6zBcCSw3ixd3Ua9CaU9Fy0Bq8_jrbJz9W9TQKyIMn4XtHwG76Fhr878VqtDyvju7FOxqpLIVy852lWllZIlvrW5BYOQdUdCQk2ai03ctl6tWJiU9HNw4y-5XSY-33hLcQ4GA-tpwDDUGY0z1BsyPqBwPBZ0ERwBdbm7fP8Iu4ftELcy1OieAzsFhL-ncjhMUI84erFahhnSEA')
+
   useEffect(() => {
     if (hash) {
       const element = document.getElementById(hash.slice(1));
@@ -27,7 +29,7 @@ function Landing() {
   return (
     <>
       <Flex
-        style={{ height: "90vh" }}
+        style={{ height: "91.5vh" }}
         direction={"column"}
         alignItems={"center"}
         justifyContent={"center"}

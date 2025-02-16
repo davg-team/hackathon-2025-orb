@@ -2,6 +2,7 @@ import { Button, Icon } from "@gravity-ui/uikit";
 import styles from "./index.module.css";
 import { PencilToLine } from "@gravity-ui/icons";
 import { Link } from "react-router-dom";
+import Cookies from "js-cookie";
 
 interface VeteranData {
   id: string;
@@ -33,18 +34,31 @@ function PersonCard({
   editabe,
   accessable,
   person,
+  fetchRequests
 }: {
   editabe?: boolean;
   accessable?: boolean;
   person?: VeteranData;
+  fetchRequests?: () => void
 }) {  
+  async function acceptRequest() {
+      await fetch(`/api/records/${person?.id}/publish`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${Cookies.get("access_token")}`,
+        }
+      })
+      if (fetchRequests) {
+        fetchRequests()
+      }
+    }
   return (
-    <Link to={`/person/${person?.id}`} style={{ width: "100%" }}>
+    
       <div className={styles.personeCard}>
         <div>
-          <p className={styles.title}>{`${person?.name || "–"} ${
+          <p className={styles.title}><Link to={`/person/${person?.id}`} style={{ width: "100%" }}>{`${person?.name || "–"} ${
             person?.middle_name || "–"
-          } ${person?.last_name || "–"}`}</p>
+          } ${person?.last_name || "–"}`}</Link></p>
           <p className={styles.text}>{person?.birth_date || "–"}</p>
           <p className={styles.text}>район {person?.birth_place || "–"}</p>
         </div>
@@ -57,15 +71,13 @@ function PersonCard({
           )}
           {accessable && (
             <>
-              <Button view="action" style={{ color: "white" }}>
+              <Button view="action" onClick={acceptRequest} style={{ color: "white" }}>
                 Принять
               </Button>{" "}
-              / <Button view="outlined">отклонить</Button>
             </>
           )}
         </div>
       </div>
-    </Link>
   );
 }
 
