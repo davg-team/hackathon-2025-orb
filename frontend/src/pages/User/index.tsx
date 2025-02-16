@@ -30,6 +30,9 @@ function User() {
           <Text variant="display-1">{data.full_name}</Text>
           <Text variant="body-3">{data.organization}</Text>
         </Flex>
+        <Flex>
+          <a href="/api/logs/">Посмотреть логи</a>
+        </Flex>
       </Flex>
       <TabProvider value={activeTab} onUpdate={setActiveTab}>
         <TabList>

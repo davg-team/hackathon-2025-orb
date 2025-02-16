@@ -167,7 +167,7 @@ services:
     #   - frontend-build
     volumes:
       - ./frontend/dist:/frontend/build
-      - ./hackathon-8.orb.ru:/etc/letsencrypt/live/hackathon-8.orb.ru
+      # - ./hackathon-8.orb.ru:/etc/letsencrypt/live/hackathon-8.orb.ru
       # - ./router/nginx.conf:/etc/nginx/conf.d/default.conf:ro
     networks:
       - backbone

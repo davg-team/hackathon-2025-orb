@@ -20,6 +20,10 @@ export default defineConfig({
         secure: false,
         changeOrigin: true,
       },
+
+      '/user-documents': {
+        target: 'http://hackathon-8.orb.ru:9000/'
+      }
     },
   },
   resolve: {
